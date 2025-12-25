@@ -30,7 +30,7 @@ func TestNextToken(t *testing.T) {
 		{
 			"turn right",
 			[]token.Token{
-				{Type: token.VERB, Literal: "turn"},
+				{Type: token.VERB | token.NOUN, Literal: "turn"},
 				{Type: token.NOUN, Literal: "right"},
 				{Type: token.EOF, Literal: string(byte(0))},
 			},
@@ -50,7 +50,7 @@ func TestNextToken(t *testing.T) {
 		for _, exToken := range tt.expectedTypes {
 			tok := l.NextToken()
 			if tok.Type != exToken.Type {
-				t.Fatalf("tests[%d] - tokentype wrong. expected:%q, got:%q", i, exToken.Type, tok.Type)
+				t.Fatalf("tests[%d] - tokentype wrong. expected:%q, got:%q", i, exToken.Type.String(), tok.Type.String())
 			}
 			if tok.Literal != exToken.Literal {
 				t.Fatalf("tests[%d] - tokenliteral wrong. expected:%q, got:%q", i, exToken.Literal, tok.Literal)

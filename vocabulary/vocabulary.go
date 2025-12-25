@@ -1,31 +1,30 @@
 package vocabulary
 
+import (
+	"strings"
+	"text-adventure/token"
+)
+
 type Vocabulary struct {
-	verbs map[string]bool
-	nouns map[string]bool
+	words map[string]token.TokenType
 }
 
 func New() *Vocabulary {
 	return &Vocabulary{
-		verbs: make(map[string]bool),
-		nouns: make(map[string]bool),
+		words: make(map[string]token.TokenType),
 	}
 }
 
-func (v *Vocabulary) AddVerb(word string) {
-	v.verbs[word] = true
-}
-
-func (v *Vocabulary) AddNoun(word string) {
-	v.nouns[word] = true
-}
-
-func (v *Vocabulary) IsVerb(word string) bool {
-	return v.verbs[word]
-}
-
-func (v *Vocabulary) IsNoun(word string) bool {
-	return v.nouns[word]
+func (v *Vocabulary) LookupWord(word string) token.Token {
+	lower := strings.ToLower(word)
+	tokenType, exists := v.words[lower]
+	if !exists {
+		tokenType = token.ILLEGAL
+	}
+	return token.Token{
+		Literal: word,
+		Type:    tokenType,
+	}
 }
 
 // The Vocabulary that is available at the start of the game.
@@ -33,14 +32,50 @@ func (v *Vocabulary) IsNoun(word string) bool {
 func DefaultVocabulary() *Vocabulary {
 	v := New()
 
-	verbs := []string{"take", "get", "drop", "look", "examine", "go", "open", "close", "use", "peek", "turn", "grab", "pull", "turn-on", "pick-up"}
-	for _, verb := range verbs {
-		v.AddVerb(verb)
-	}
+	var vocabulary = map[string]token.TokenType{
+		// Directions
+		"north": token.NOUN,
+		"south": token.NOUN,
+		"east":  token.NOUN,
+		"west":  token.NOUN,
+		"up":    token.NOUN | token.PARTICLE,
+		"down":  token.NOUN,
+		"left":  token.NOUN,
+		"right": token.NOUN,
 
-	nouns := []string{"book", "shelf", "note", "bookshelf", "desk", "paper", "room", "door", "key", "lamp", "light", "north", "south", "east", "west", "left", "right", "up", "down", "sword"}
-	for _, noun := range nouns {
-		v.AddNoun(noun)
+		// items
+		"book":     token.NOUN,
+		"shelf":    token.NOUN,
+		"room":     token.NOUN,
+		"desk":     token.NOUN,
+		"skeleton": token.NOUN,
+		"paper":    token.NOUN,
+		"note":     token.NOUN,
+		"door":     token.NOUN,
+		"lamp":     token.NOUN,
+		"rock":     token.NOUN,
+		"sword":    token.NOUN,
+
+		// actions
+		"get":   token.VERB,
+		"go":    token.VERB,
+		"drop":  token.VERB,
+		"look":  token.VERB,
+		"take":  token.VERB,
+		"turn":  token.VERB | token.NOUN,
+		"light": token.VERB | token.NOUN,
+		"walk":  token.VERB | token.NOUN,
+
+		// acticles
+		"the": token.ARTICLE,
+
+		// prepositions
+		"in":   token.PREPOSITION,
+		"with": token.PREPOSITION,
+
+		// TODO: turn into verb and particle
+		"pick-up": token.VERB,
 	}
+	v.words = vocabulary
 	return v
 }
