@@ -56,7 +56,7 @@ func TestParseCommand(t *testing.T) {
 
 			if p.errors != nil {
 				for i, err := range p.errors {
-					t.Errorf("unexpected error %d: %v", i, err.Message)
+					t.Errorf("unexpected error %d: %v", i, err)
 					t.Errorf("command: %s", cmd.String())
 					return
 				}
@@ -65,6 +65,83 @@ func TestParseCommand(t *testing.T) {
 			if cmd.String() != tt.expectedCmd {
 				t.Errorf("wrong command string. expected=%q, got=%q",
 					tt.expectedCmd, cmd.String())
+			}
+		})
+	}
+}
+
+func TestParser(t *testing.T) {
+	tests := []struct {
+		name      string
+		input     string
+		wantVerb  string
+		wantObj   string
+		expectErr bool
+	}{
+		{
+			name:     "Simple Command",
+			input:    "get lamp",
+			wantVerb: "get",
+			wantObj:  "lamp",
+		},
+		{
+			name:     "Ambiguous Start (Light as Verb)",
+			input:    "light lamp",
+			wantVerb: "light",
+			wantObj:  "lamp",
+		},
+		{
+			name:     "Ignored Articles",
+			input:    "get the rock",
+			wantVerb: "get",
+			wantObj:  "rock",
+		},
+		{
+			name:      "Unknown Verb",
+			input:     "jump rock",
+			expectErr: true,
+		},
+		{
+			name:      "Missing Noun",
+			input:     "get",
+			expectErr: true,
+		},
+		{
+			name:     "Preposition (Extension)",
+			input:    "put rock in box",
+			wantVerb: "put",
+			wantObj:  "rock",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			vocab := vocabulary.DefaultVocabulary()
+			l := lexer.New(tt.input, vocab)
+			p := New(l)
+
+			cmd := p.ParseCommand()
+
+			if tt.expectErr {
+				if len(p.errors) == 0 {
+					t.Errorf("Expected error, got none")
+				}
+				return
+			}
+
+			if p.errors != nil {
+				for i, err := range p.errors {
+					t.Errorf("unexpected error %d: %v", i, err)
+					t.Errorf("command: %s", cmd.String())
+					return
+				}
+			}
+
+			if cmd.Verb.Verb.Literal != tt.wantVerb {
+				t.Errorf("Verb: got %s, want %s", cmd.Verb, tt.wantVerb)
+			}
+			if cmd.Object.Noun.Literal != tt.wantObj {
+				t.Errorf("Obj: got %s, want %s", cmd.Object, tt.wantObj)
 			}
 		})
 	}

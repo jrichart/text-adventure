@@ -1,9 +1,9 @@
 package lexer
 
 import (
-	"strings"
 	"text-adventure/token"
 	"text-adventure/vocabulary"
+	"unicode"
 )
 
 type Lexer struct {
@@ -32,12 +32,13 @@ func (l *Lexer) NextToken() token.Token {
 		return tok
 	}
 	if isLetter(l.ch) {
-		tok.Literal = l.readWord()
-		tok.Type = l.classifyWord(tok.Literal)
+		word := l.readWord()
+		tok = l.vocab.LookupWord(word)
 		return tok
 	} else {
 		tok = newToken(token.ILLEGAL, l.ch)
 	}
+	l.readChar()
 	return tok
 }
 
@@ -65,19 +66,8 @@ func (l *Lexer) readWord() string {
 	return l.input[position:l.position]
 }
 
-func (l *Lexer) classifyWord(word string) token.TokenType {
-	lower := strings.ToLower(word)
-	if l.vocab.IsVerb(lower) {
-		return token.VERB
-	}
-	if l.vocab.IsNoun(lower) {
-		return token.NOUN
-	}
-	return token.WORD
-}
-
 func isLetter(ch byte) bool {
-	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '-'
+	return unicode.IsLetter(rune(ch)) || ch == '-'
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
