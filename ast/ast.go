@@ -1,72 +1,71 @@
 package ast
 
-import "fmt"
+import (
+	"fmt"
+	"text-adventure/token"
+)
 
 type Node interface {
+	TokenLiteral() string
 	String() string
 }
 
 type Command struct {
-	VerbGroup VerbGroup
-	NounGroup NounGroup
+	Verb           *VerbGroup
+	Object         *NounGroup
+	IndirectObject *NounGroup
 }
 
 type NounGroup struct {
-	Adjectives []*Adjective
-	Noun       Noun
+	Article    *token.Token
+	Adjectives []token.Token
+	Noun       token.Token
 }
 
 type VerbGroup struct {
-	Verb Verb
+	Verb     token.Token
+	Particle *token.Token
 }
 
-type Noun struct {
-	Value string
-}
-
-type Adjective struct {
-	Value string
-}
-
-type Verb struct {
-	Value string
+func (c *Command) TokenLiteral() string {
+	if c.Verb != nil {
+		return c.Verb.TokenLiteral()
+	}
+	return ""
 }
 
 func (c *Command) String() string {
-	result := ""
-	result += c.VerbGroup.String()
-	result += c.NounGroup.String()
+	result := c.Verb.String()
+	if c.Object != nil {
+		result += " " + c.Object.String()
+	}
+	if c.IndirectObject != nil {
+		result += " " + c.IndirectObject.String()
+	}
 	return result
 }
 
+func (ng *NounGroup) TokenLiteral() string { return ng.Noun.Literal }
 func (ng *NounGroup) String() string {
 	result := ""
-	if len(ng.Adjectives) > 0 {
-		for _, adj := range ng.Adjectives {
-			result += adj.String() + " "
-		}
+	if ng.Article != nil {
+		result += ng.Article.Literal + " "
 	}
-	if result == "" && ng.Noun.Value != "" {
-		result += " "
+
+	for _, adj := range ng.Adjectives {
+		result += adj.Literal + " "
 	}
-	result += ng.Noun.String()
+
+	result += ng.Noun.Literal
 	return result
 }
 
-func (n *Noun) String() string {
-	return n.Value
-}
-
-func (a *Adjective) String() string {
-	return a.Value
-}
-
+func (vb *VerbGroup) TokenLiteral() string { return vb.Verb.Literal }
 func (vb *VerbGroup) String() string {
-	return vb.Verb.String()
-}
-
-func (v *Verb) String() string {
-	return v.Value
+	if vb.Particle != nil {
+		return vb.Verb.Literal + " " + vb.Particle.Literal
+	}
+	return vb.Verb.Literal
 }
 
 type ParseError struct {

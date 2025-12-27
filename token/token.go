@@ -19,6 +19,10 @@ type Token struct {
 	Literal string
 }
 
+func (t *Token) HasType(tokenType TokenType) bool {
+	return t.Type&tokenType != 0
+}
+
 func (tt *TokenType) String() string {
 	switch *tt {
 	case ILLEGAL:
