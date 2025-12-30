@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/user"
+	"text-adventure/repl"
 )
 
 func main() {
@@ -10,7 +12,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Hello %s! This is the Monkey programming language!\n",
+	fmt.Printf("Hello %s! You have woken up\n",
 		user.Username)
-	fmt.Printf("Feel free to type in commands\n")
+	fmt.Printf("Feel free to type in commands to look around and move\n")
+	repl.Start(os.Stdin, os.Stdout)
 }

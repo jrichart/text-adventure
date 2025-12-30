@@ -49,8 +49,8 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	}
 }
 
-func (p *Parser) Errors() []error {
-	return p.Errors()
+func (p *Parser) Errors() []string {
+	return p.errors
 }
 
 func (p *Parser) peekError(t token.TokenType) {
