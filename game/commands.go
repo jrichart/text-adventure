@@ -39,7 +39,7 @@ func (ch *CommandHandler) handlerMove(cmd ast.Command) string {
 
 func (ch *CommandHandler) HandleLook(cmd ast.Command) string {
 
-	return ""
+	return ch.World.Player.CurrentRoom.Description
 }
 
 func (ch *CommandHandler) handleUnknown(cmd ast.Command) string {
