@@ -107,7 +107,7 @@ func oppositeDirection(dir Direction) Direction {
 const (
 	Tower = iota
 	LibraryEntrance
-	CirculationeDesk
+	CirculationDesk
 	ReshelvingCart
 	SkeletonRoom
 	CardCatalog
@@ -123,7 +123,7 @@ const (
 var RoomNames = map[int]string{
 	Tower:           "Tower",
 	LibraryEntrance: "Library Entrance",
-	CirculationeDesk:   "Circulation Desk",
+	CirculationDesk: "Circulation Desk",
 	ReshelvingCart:  "Reshelving Cart",
 	SkeletonRoom:    "Skeleton Room",
 	CardCatalog:     "Card Catalog",
